@@ -43,28 +43,34 @@ The agent handles greetings naturally, manages state across conversation turns, 
 
 ## Installation
 
-1. **Navigate to the FelixAgent directory:**
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/danielavarelat/SendMoneyAgent.git
+   cd agents
+   ```
+
+2. **Navigate to the FelixAgent directory:**
    ```bash
    cd FelixAgent
    ```
 
-2. **Set up a virtual environment (recommended):**
+3. **Set up a virtual environment (recommended):**
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. **Install dependencies:**
+4. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Install the package in editable mode (so ADK can discover it):**
+5. **Install the package in editable mode (so ADK can discover it):**
    ```bash
    pip install -e .
    ```
 
-5. **Set up your environment variables:**
+6. **Set up your environment variables:**
    
    Create a `.env` file in the project root (`agents/` directory):
    ```
