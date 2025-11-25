@@ -37,9 +37,14 @@ The agent handles greetings naturally, manages state across conversation turns, 
 
 ## Prerequisites
 
-- Python 3.10+
+- Python 3.10+ (required - check with `python3 --version`)
 - Google ADK >=0.1.0
 - Google API Key with Gemini API access
+
+**Note:** If you have Python 3.9 or earlier, you'll need to upgrade. You can:
+- Install Python 3.10+ from [python.org](https://www.python.org/downloads/)
+- Use `pyenv` to manage multiple Python versions
+- Use `brew install python@3.10` on macOS
 
 ## Installation
 
@@ -55,6 +60,19 @@ The agent handles greetings naturally, manages state across conversation turns, 
    ```
 
 3. **Set up a virtual environment (recommended):**
+   
+   First, verify you have Python 3.10+:
+   ```bash
+   python3 --version  # Should show 3.10.x or higher
+   ```
+   
+   If you need to use a specific Python version (e.g., if `python3` points to 3.9):
+   ```bash
+   python3.10 -m venv venv  # or python3.11, python3.12, etc.
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+   
+   Or with the default python3:
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -65,10 +83,15 @@ The agent handles greetings naturally, manages state across conversation turns, 
    pip install -r requirements.txt
    ```
 
-5. **Install the package in editable mode (so ADK can discover it):**
+5. **Install the package in editable mode (optional, but recommended for testing):**
    ```bash
    pip install -e .
    ```
+   
+   **Note:** `adk web` can discover the agent without this step, but installing in editable mode is recommended if you plan to:
+   - Run the test suite (`python -m FelixAgent.test_agent`)
+   - Import the agent programmatically
+   - Ensure all imports work correctly
 
 6. **Set up your environment variables:**
    
@@ -175,15 +198,15 @@ Agent: ✅ ✅ ✅ Transfer Successful!
    agent-module = "agent"
    agent-variable = "root_agent"
    ```
-3. Make sure you've installed the package: `cd FelixAgent && pip install -e .`
-4. Verify `FelixAgent/agent.py` exists and contains `root_agent`
-5. Try running `python -c "from FelixAgent.agent import root_agent; print('Agent found!')"` to test import
+3. Verify `FelixAgent/agent.py` exists and contains `root_agent`
+4. If you need to import the agent programmatically or run tests, install the package: `cd FelixAgent && pip install -e .`
+5. Try running `python -c "from FelixAgent.agent import root_agent; print('Agent found!')"` to test import (requires `pip install -e .`)
 
 ### Import errors
 
 **Problem:** `ModuleNotFoundError` or import errors.
 
 **Solution:**
-1. Make sure you've installed dependencies: `pip install -r requirements.txt`
-2. Install the package: `pip install -e .` (from `FelixAgent/` directory)
+1. Make sure you've installed dependencies: `pip install -r requirements.txt` (from `FelixAgent/` directory)
+2. If you're importing the agent programmatically or running tests, install the package: `pip install -e .` (from `FelixAgent/` directory)
 3. Check that all required files exist: `agent.py`, `send_money_agent.py`, etc.
