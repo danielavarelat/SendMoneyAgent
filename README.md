@@ -1,32 +1,6 @@
 # Send Money Agent
 
-A self-contained conversational agent built with Google ADK that helps users send money by collecting transfer details through natural conversation.
-
-## 📁 Project Structure
-
-**IMPORTANT:** This project has a specific directory structure:
-
-```
-apps/                          # Parent directory (for Docker)
-├── Dockerfile                 # Docker build file (builds from apps/)
-├── docker-compose.yml         # Docker Compose configuration
-└── FelixAgent/                # Main agent code directory
-    ├── agent.py               # Root agent definition (root_agent)
-    ├── send_money_agent.py    # Tool functions
-    ├── send_money_state.py    # State management
-    ├── utils.py               # Utilities
-    ├── test_agent.py          # Test suite
-    ├── pyproject.toml         # ADK configuration (agent discovery)
-    ├── requirements.txt       # Python dependencies
-    └── README.md              # This file
-```
-
-**Key Points:**
-- All agent code is in the `FelixAgent/` subdirectory
-- `pyproject.toml` is in `FelixAgent/` - this is where ADK looks for the agent
-- Docker files are in the parent `apps/` directory
-- For local development, work from the `FelixAgent/` directory
-- For Docker, build from the `apps/` directory
+A conversational agent built with Google ADK that helps users send money by collecting transfer details through natural conversation.
 
 ## Overview
 
@@ -50,7 +24,6 @@ The agent handles greetings naturally, manages state across conversation turns, 
 - **Input Validation**: Validates currency, country, and delivery method with helpful error messages
 - **Format Guidance**: Provides expected formats when asking for account numbers and other fields
 - **Collected Info Display**: Always shows what information has been collected before asking for the next field
-- **Tool Response Handling**: Uses callbacks to ensure tool responses are shown verbatim (prevents infinite loops by not intercepting questions)
 
 ## Supported Countries and Currencies
 
@@ -62,113 +35,66 @@ The agent handles greetings naturally, manages state across conversation turns, 
 - **EL SALVADOR** → USD (US Dollar)
 - **GUATEMALA** → GTQ (Guatemalan Quetzal)
 
+## Prerequisites
+
+- Python 3.10+
+- Google ADK >=0.1.0
+- Google API Key with Gemini API access
+
 ## Installation
-
-### Option 1: Docker (Recommended for Self-Contained Solution)
-
-**Note:** Docker files are in the parent `apps/` directory, not in `FelixAgent/`.
-
-1. **Build and run with Docker Compose (from `apps/` directory):**
-   ```bash
-   cd /path/to/apps
-   docker-compose up --build
-   ```
-
-2. **Or build and run manually:**
-   ```bash
-   cd /path/to/apps
-   docker build -t send-money-agent .
-   docker run -it --rm \
-     -e GOOGLE_API_KEY="your-api-key-here" \
-     -p 8080:8080 \
-     send-money-agent
-   ```
-
-3. **Set your API key:**
-   - Create a `.env` file with `GOOGLE_API_KEY=your-api-key-here`, or
-   - Pass it as an environment variable: `-e GOOGLE_API_KEY="your-key"`
-
-### Option 2: Local Installation
-
-**IMPORTANT:** You must work from the `FelixAgent/` directory for local development.
 
 1. **Navigate to the FelixAgent directory:**
    ```bash
    cd FelixAgent
    ```
 
-2. **Install dependencies:**
+2. **Set up a virtual environment (recommended):**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Install the package in editable mode (so ADK can discover it):**
+4. **Install the package in editable mode (so ADK can discover it):**
    ```bash
    pip install -e .
    ```
 
-4. **Set up your environment variables:**
-   ```bash
-   export GOOGLE_API_KEY="your-api-key-here"
-   ```
+5. **Set up your environment variables:**
    
-   Or create a `.env` file in the `FelixAgent/` directory:
+   Create a `.env` file in the `FelixAgent/` directory:
    ```
    GOOGLE_API_KEY=your-api-key-here
+   ```
+   
+   Or export it in your shell:
+   ```bash
+   export GOOGLE_API_KEY="your-api-key-here"
    ```
 
 ## Usage
 
-### Interactive Web Interface
-
-**CRITICAL:** You must run `adk web` from the `FelixAgent/` directory where `pyproject.toml` is located.
+Run `adk web` from the `FelixAgent/` directory where `pyproject.toml` is located:
 
 ```bash
-# Navigate to FelixAgent directory
 cd FelixAgent
-
-# Make sure the package is installed
-pip install -e .
-
-# Run ADK web interface
 adk web
 ```
 
-ADK will automatically discover the agent by reading `pyproject.toml` in the current directory. The `pyproject.toml` file tells ADK:
-- `agent-module = "agent"` - the module to import
-- `agent-variable = "root_agent"` - the variable name in that module
-
-**If `adk web` doesn't find the agent:**
-1. Make sure you're in the `FelixAgent/` directory
-2. Make sure `pyproject.toml` exists in the current directory
-3. Make sure you've run `pip install -e .` to install the package
-4. Check that `agent.py` exists and contains `root_agent`
+ADK will automatically discover the agent by reading `pyproject.toml` in the current directory.
 
 ### Testing
 
-Run the test suite from the `FelixAgent/` directory:
+Run the test suite:
 
 ```bash
 cd FelixAgent
 python test_agent.py
 ```
-
-### Programmatic Usage
-
-From the `FelixAgent/` directory:
-
-```python
-from agent import root_agent
-# Use root_agent with ADK's runner or web interface
-```
-
-Or if installed as a package:
-
-```python
-from FelixAgent.agent import root_agent
-# Use root_agent with ADK's runner or web interface
-```
-
 
 ## How It Works
 
@@ -227,69 +153,6 @@ Agent: ✅ ✅ ✅ Transfer Successful!
        ...
 ```
 
-## Docker Deployment
-
-### Building the Image
-
-**IMPORTANT:** Build from the `apps/` directory (parent directory), not from `FelixAgent/`.
-
-```bash
-# Navigate to the apps/ directory (parent of FelixAgent/)
-cd /path/to/apps
-
-# Build the Docker image
-docker build -t send-money-agent .
-```
-
-### Running the Container
-
-```bash
-# From the apps/ directory
-cd /path/to/apps
-
-docker run -it --rm \
-  -e GOOGLE_API_KEY="your-api-key-here" \
-  -p 8080:8080 \
-  send-money-agent
-```
-
-### Using Docker Compose
-
-```bash
-# From the apps/ directory
-cd /path/to/apps
-
-# Set your API key in .env file (optional - can also use environment variable)
-echo "GOOGLE_API_KEY=your-api-key-here" > .env
-
-# Start the service
-docker-compose up --build
-```
-
-## Development
-
-### Running Tests
-
-From the `FelixAgent/` directory:
-
-```bash
-cd FelixAgent
-python test_agent.py
-```
-
-### Code Structure
-
-- **`agent.py`**: Defines the `root_agent` (LlmAgent) with tools and callbacks
-- **`send_money_agent.py`**: Contains all tool functions that the agent can call
-- **`send_money_state.py`**: Defines the `SendMoneyState` dataclass for state management
-- **`utils.py`**: Utility functions for extraction, validation, and formatting
-
-## Requirements
-
-- Python 3.10+ (as specified in `pyproject.toml`)
-- Google ADK >=0.1.0
-- Google API Key with Gemini API access
-
 ## Troubleshooting
 
 ### `adk web` doesn't find the agent
@@ -308,16 +171,6 @@ python test_agent.py
 4. Verify `agent.py` exists and contains `root_agent`
 5. Try running `python -c "from agent import root_agent; print('Agent found!')"` to test import
 
-### Docker container doesn't load agent
-
-**Problem:** Docker container runs but ADK doesn't find the agent.
-
-**Solution:**
-1. Make sure you're building from the `apps/` directory (parent of `FelixAgent/`)
-2. Check that the Dockerfile copies `FelixAgent/` correctly
-3. Verify the Dockerfile runs `pip install -e .` in `/app/FelixAgent`
-4. Check that the CMD runs `adk web` from `/app/FelixAgent` directory
-
 ### Import errors
 
 **Problem:** `ModuleNotFoundError` or import errors.
@@ -326,7 +179,3 @@ python test_agent.py
 1. Make sure you've installed dependencies: `pip install -r requirements.txt`
 2. Install the package: `pip install -e .` (from `FelixAgent/` directory)
 3. Check that all required files exist: `agent.py`, `send_money_agent.py`, etc.
-
-## License
-
-This is a technical assessment solution.
