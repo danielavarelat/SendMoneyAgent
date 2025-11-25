@@ -170,13 +170,17 @@ def extract_beneficiary_name(text: str) -> Optional[str]:
         'mexico', 'honduras', 'colombia', 'nicaragua', 'guatemala', 'salvador',
         'dominican', 'republic', 'change', 'update', 'amount', 'currency',
         'to', 'for', 'with', 'and', 'or', 'but', 'is', 'are', 'was', 'were',
-        'someone', 'somebody', 'person', 'recipient', 'beneficiary'
+        'someone', 'somebody', 'person', 'recipient', 'beneficiary',
+        'actually', 'really', 'just', 'want', 'like', 'need'
     }
     
     # Exclude common phrases that might be mistaken for names
     excluded_phrases = [
         'send money', 'send money to', 'send to', 'money to', 'want to send',
-        'help me send', 'i want to', 'would like to', 'need to send'
+        'help me send', 'i want to', 'would like to', 'need to send',
+        'change the', 'change amount', 'change currency', 'change country',
+        'change delivery', 'change method', 'change beneficiary', 'change name',
+        'change account', 'update the', 'update amount'
     ]
     
     # First check if text contains excluded phrases - if so, don't extract names
@@ -187,6 +191,38 @@ def extract_beneficiary_name(text: str) -> Optional[str]:
             # This prevents "send money to" from being extracted as a name
             return None
     
+    # First, try to find names after common prepositions (to, for, etc.)
+    # Pattern: "to [name]" or "for [name]"
+    preposition_pattern = r'\b(to|for)\s+([A-Za-z]{2,}(?:\s+[A-Za-z]{2,}){0,2})\b'
+    preposition_matches = re.finditer(preposition_pattern, text, re.IGNORECASE)
+    for match in preposition_matches:
+        name = match.group(2).strip()  # Get the name part, not the preposition
+        name_lower = name.lower()
+        name_words = name_lower.split()
+        
+        # Skip if the name itself contains excluded words (other than the preposition we already removed)
+        if any(word in excluded_words for word in name_words):
+            continue
+        
+        # Skip if it's a country name
+        if name.upper() in COUNTRY_CURRENCY_MAP:
+            continue
+        
+        # Skip if it looks like a currency code
+        if len(name) == 3 and name.isupper() and name in CURRENCY_NAMES:
+            continue
+        
+        # Skip if it's a number
+        if name.replace(' ', '').isdigit():
+            continue
+        
+        # Skip if it contains numbers
+        if re.search(r'\d', name):
+            continue
+        
+        # This looks like a valid name after a preposition
+        return name
+    
     # Look for name patterns - words that look like names (2+ letters, not all caps unless it's a short word)
     # Pattern: One or more words, each with 2+ letters
     # Accept: "john", "John", "JOHN", "john smith", "John Smith", "JOHN SMITH", "john smith garcia"
@@ -196,8 +232,30 @@ def extract_beneficiary_name(text: str) -> Optional[str]:
     for match in matches:
         name = match.group(1).strip()
         name_lower = name.lower()
+        name_words = name_lower.split()
         
-        # Skip if it's an excluded word
+        # If the name contains excluded words, try to extract just the name part
+        # by removing excluded words from the beginning and end
+        if any(word in excluded_words for word in name_words):
+            # Try to clean the name by removing excluded words from edges
+            cleaned_words = [w for w in name_words if w not in excluded_words]
+            if cleaned_words:
+                # Reconstruct the name with original capitalization
+                original_words = name.split()
+                cleaned_name_parts = []
+                for orig_word in original_words:
+                    if orig_word.lower() not in excluded_words:
+                        cleaned_name_parts.append(orig_word)
+                if cleaned_name_parts:
+                    name = ' '.join(cleaned_name_parts)
+                    name_lower = name.lower()
+                    name_words = name_lower.split()
+                else:
+                    continue
+            else:
+                continue
+        
+        # Skip if it's an excluded word (single word check)
         if name_lower in excluded_words:
             continue
         
@@ -341,8 +399,9 @@ def detect_correction(text: str) -> Tuple[Optional[str], Optional[str]]:
     """
     text_lower = text.lower()
     
-    # Pattern: "change [field] to [value]" or "change [field] [value]"
-    change_pattern = re.search(r'change\s+(\w+)(?:\s+to\s+)?(.+)?', text_lower)
+    # Pattern: "change [the] [field] to [value]" or "change [the] [field] [value]"
+    # Handles: "change amount to 300", "change the amount to 300", "change amount 300"
+    change_pattern = re.search(r'change(?:\s+the)?\s+(\w+)(?:\s+to\s+)?(.+)?', text_lower)
     if change_pattern:
         field_word = change_pattern.group(1)
         value_text = change_pattern.group(2) if change_pattern.group(2) else None
@@ -360,7 +419,12 @@ def detect_correction(text: str) -> Tuple[Optional[str], Optional[str]]:
         }
         
         if field_word in field_mapping:
-            return field_mapping[field_word], value_text.strip() if value_text else None
+            # Clean up value_text - remove leading/trailing whitespace and common words
+            if value_text:
+                value_text = value_text.strip()
+                # Remove leading words like "to", "the", etc. if they're at the start
+                value_text = re.sub(r'^(to|the)\s+', '', value_text, flags=re.IGNORECASE)
+            return field_mapping[field_word], value_text if value_text else None
     
     return None, None
 

@@ -140,35 +140,39 @@ def collect_transfer_details(tool_context: ToolContext, user_input: str) -> str:
             return f"I'm sorry, but {error_msg}. Please use the expected format: {formats['currency']}. What currency would you like to use?"
         extracted["currency"] = cur
 
-    # Country - context-aware extraction
-    # Only extract country if currency was NOT extracted in this same input
-    # This prevents "MXN" from being treated as a country when currency is missing
+    # Country - extract if found
+    # extract_country only matches actual country names, not currency codes, so it's safe to extract
+    # even when currency is also present in the input
     ctry = extract_country(user_input)
     if ctry and state.country != ctry:
-        # Only extract country if we didn't just extract currency (context-aware)
-        if cur is None:
-            # Validate country
-            is_valid, error_msg = validate_country_value(ctry)
-            if not is_valid:
-                # Save state before returning error
-                _update_state_in_context(tool_context, _send_money_state_to_dict(state))
-                return f"{error_msg} Which country should the money be sent to?"
-            extracted["country"] = ctry
+        # Validate country
+        is_valid, error_msg = validate_country_value(ctry)
+        if not is_valid:
+            # Save state before returning error
+            _update_state_in_context(tool_context, _send_money_state_to_dict(state))
+            return f"{error_msg} Which country should the money be sent to?"
+        extracted["country"] = ctry
     elif ctry is None and state.country is None and cur is None:
         # Only check for country-like input if:
         # 1. No country was extracted
         # 2. No currency was extracted in this input (context-aware)
         # 3. Country is still missing
         # 4. Currency is NOT currently the missing field (if currency is missing, prioritize currency extraction)
+        # 5. Check if a beneficiary name was extracted - if so, don't validate as country
+        name_check = extract_beneficiary_name(user_input)
         if "currency" not in missing_fields or state.currency is not None:
             user_input_upper = user_input.strip().upper()
-            # Check if it's a single capitalized word that's not in our supported countries
-            # AND not a currency code
+            # Only validate as country if:
+            # - It's a single word (most countries are single words, except "EL SALVADOR" and "REPUBLICA DOMINICANA")
+            # - No beneficiary name was extracted (if name was extracted, it's clearly not a country)
+            # - Not a currency code
+            # - Not already in our country map
             if (user_input_upper and 
+                name_check is None and  # No name was extracted - if name was extracted, don't validate as country
                 user_input_upper not in COUNTRY_CURRENCY_MAP and
                 user_input_upper not in ['USD', 'MXN', 'HNL', 'DOP', 'NIO', 'COP', 'GTQ'] and  # Not a currency code
                 not any(char.isdigit() for char in user_input_upper) and
-                len(user_input_upper.split()) <= 3):  # Country names are usually 1-3 words
+                len(user_input_upper.split()) == 1):  # Only single words (to avoid matching names like "Mary Johnson")
                 # Try to validate it - this will give us a proper error message
                 is_valid, error_msg = validate_country_value(user_input.strip())
                 if not is_valid:

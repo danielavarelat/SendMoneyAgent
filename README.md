@@ -89,12 +89,14 @@ ADK will automatically discover the agent by reading `pyproject.toml` in the `Fe
 
 ### Testing
 
-Run the test suite:
+Run the test suite as a module (from the project root):
 
 ```bash
-cd FelixAgent
-python test_agent.py
+cd agents
+python -m FelixAgent.test_agent
 ```
+
+This runs the test as part of the package, allowing relative imports to work correctly.
 
 ## How It Works
 
