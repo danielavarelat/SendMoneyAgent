@@ -66,7 +66,7 @@ The agent handles greetings naturally, manages state across conversation turns, 
 
 5. **Set up your environment variables:**
    
-   Create a `.env` file in the `FelixAgent/` directory:
+   Create a `.env` file in the project root (`agents/` directory):
    ```
    GOOGLE_API_KEY=your-api-key-here
    ```
@@ -78,14 +78,14 @@ The agent handles greetings naturally, manages state across conversation turns, 
 
 ## Usage
 
-Run `adk web` from the `FelixAgent/` directory where `pyproject.toml` is located:
+Run `adk web` from the project root (`agents/` directory):
 
 ```bash
-cd FelixAgent
+cd agents
 adk web
 ```
 
-ADK will automatically discover the agent by reading `pyproject.toml` in the current directory.
+ADK will automatically discover the agent by reading `pyproject.toml` in the `FelixAgent/` subdirectory.
 
 ### Testing
 
@@ -160,16 +160,16 @@ Agent: ✅ ✅ ✅ Transfer Successful!
 **Problem:** Running `adk web` shows "No agents found" or similar error.
 
 **Solution:**
-1. Make sure you're in the `FelixAgent/` directory (where `pyproject.toml` is located)
-2. Verify `pyproject.toml` exists and contains:
+1. Make sure you're in the project root (`agents/` directory), not inside `FelixAgent/`
+2. Verify `FelixAgent/pyproject.toml` exists and contains:
    ```toml
    [tool.adk]
    agent-module = "agent"
    agent-variable = "root_agent"
    ```
-3. Install the package: `pip install -e .` (from `FelixAgent/` directory)
-4. Verify `agent.py` exists and contains `root_agent`
-5. Try running `python -c "from agent import root_agent; print('Agent found!')"` to test import
+3. Make sure you've installed the package: `cd FelixAgent && pip install -e .`
+4. Verify `FelixAgent/agent.py` exists and contains `root_agent`
+5. Try running `python -c "from FelixAgent.agent import root_agent; print('Agent found!')"` to test import
 
 ### Import errors
 
