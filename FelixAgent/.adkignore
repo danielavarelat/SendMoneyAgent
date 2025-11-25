@@ -1,0 +1,13 @@
+# ADK ignore file - exclude virtual environments and build directories
+agente/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+

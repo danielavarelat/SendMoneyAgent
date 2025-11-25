@@ -1,0 +1,24 @@
+[project]
+name = "send-money-agent"
+version = "1.0.0"
+description = "Send Money Agent using Google ADK"
+requires-python = ">=3.10"
+dependencies = [
+    "google-adk>=0.1.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.adk]
+# ADK configuration - tells ADK where to find the agent
+agent-module = "agent"
+agent-variable = "root_agent"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+# Package configuration - include all Python modules in current directory as top-level modules
+# This makes agent.py directly importable as 'agent'
+py-modules = ["agent", "send_money_agent", "send_money_state", "utils"]
+
