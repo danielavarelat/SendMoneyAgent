@@ -39,7 +39,13 @@ def _update_state_in_context(tool_context: ToolContext, state_dict: Dict[str, An
     
     # Update the state object in place - ADK's State object supports .update()
     # Keep all fields (including None) so the UI can see the full state structure
+    # Use both .update() and direct assignment to ensure UI visibility across ADK versions
     tool_context.state.update(state_dict)
+    
+    # Also set each key individually to ensure state is visible in UI
+    # This works around potential issues with some ADK versions
+    for key, value in state_dict.items():
+        tool_context.state[key] = value
 
 
 def _state_to_send_money_state(state_dict: Dict[str, Any]) -> SendMoneyState:

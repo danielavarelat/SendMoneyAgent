@@ -38,7 +38,7 @@ The agent handles greetings naturally, manages state across conversation turns, 
 ## Prerequisites
 
 - Python 3.10+ (required - check with `python3 --version`)
-- Google ADK >=0.1.0
+- Google ADK 1.18.0 (specified version for consistency)
 - Google API Key with Gemini API access
 
 **Note:** If you have Python 3.9 or earlier, you'll need to upgrade. You can:
@@ -83,19 +83,28 @@ The agent handles greetings naturally, manages state across conversation turns, 
    pip install -r requirements.txt
    ```
 
-5. **Set up your environment variables:**
+5. **Set up your environment variables (REQUIRED):**
    
-   Create a `.env` file in the project root (`SendMoneyAgent/` directory):
-   ```
-   GOOGLE_API_KEY=your-api-key-here
+   **You must set your Google API key before running `adk web`.**
+   
+   Option 1 - Create a `.env` file in the project root (`SendMoneyAgent/` directory):
+   ```bash
+   cd SendMoneyAgent
+   echo "GOOGLE_API_KEY=your-api-key-here" > .env
    ```
    
-   Or export it in your shell:
+   Replace `your-api-key-here` with your actual Google API key from [Google AI Studio](https://aistudio.google.com/apikey).
+   
+   Option 2 - Export it in your shell (make sure to do this before running `adk web`):
    ```bash
    export GOOGLE_API_KEY="your-api-key-here"
    ```
+   
+   **Important:** If you're using a virtual environment, make sure to export the variable in the same shell session where you activate the venv and run `adk web`.
 
 ## Usage
+
+**Important:** Make sure you've set your `GOOGLE_API_KEY` environment variable before running `adk web` (see Installation step 5).
 
 Run `adk web` from the project root (`SendMoneyAgent/` directory):
 
@@ -189,6 +198,35 @@ Agent: ✅ ✅ ✅ Transfer Successful!
    agent-variable = "root_agent"
    ```
 3. Verify `FelixAgent/agent.py` exists and contains `root_agent`
+
+### Missing API Key Error
+
+**Problem:** `ValueError: Missing key inputs argument! To use the Google AI API, provide (api_key) arguments.`
+
+**Solution:**
+1. Make sure you've set the `GOOGLE_API_KEY` environment variable:
+   ```bash
+   export GOOGLE_API_KEY="your-api-key-here"
+   ```
+   
+   Or create a `.env` file in the `SendMoneyAgent/` directory:
+   ```bash
+   echo "GOOGLE_API_KEY=your-api-key-here" > .env
+   ```
+
+2. Get your API key from [Google AI Studio](https://aistudio.google.com/apikey) if you don't have one.
+
+3. If using a virtual environment, make sure to export the variable in the same shell session:
+   ```bash
+   source venv/bin/activate
+   export GOOGLE_API_KEY="your-api-key-here"
+   adk web
+   ```
+
+4. Verify the variable is set:
+   ```bash
+   echo $GOOGLE_API_KEY
+   ```
 
 ### Import errors
 
