@@ -83,17 +83,7 @@ The agent handles greetings naturally, manages state across conversation turns, 
    pip install -r requirements.txt
    ```
 
-5. **Install the package in editable mode (optional, but recommended for testing):**
-   ```bash
-   pip install -e .
-   ```
-   
-   **Note:** `adk web` can discover the agent without this step, but installing in editable mode is recommended if you plan to:
-   - Run the test suite (`python -m FelixAgent.test_agent`)
-   - Import the agent programmatically
-   - Ensure all imports work correctly
-
-6. **Set up your environment variables:**
+5. **Set up your environment variables:**
    
    Create a `.env` file in the project root (`SendMoneyAgent/` directory):
    ```
@@ -199,8 +189,6 @@ Agent: ✅ ✅ ✅ Transfer Successful!
    agent-variable = "root_agent"
    ```
 3. Verify `FelixAgent/agent.py` exists and contains `root_agent`
-4. If you need to import the agent programmatically or run tests, install the package: `cd FelixAgent && pip install -e .`
-5. Try running `python -c "from FelixAgent.agent import root_agent; print('Agent found!')"` to test import (requires `pip install -e .`)
 
 ### Import errors
 
@@ -208,5 +196,4 @@ Agent: ✅ ✅ ✅ Transfer Successful!
 
 **Solution:**
 1. Make sure you've installed dependencies: `pip install -r requirements.txt` (from `FelixAgent/` directory)
-2. If you're importing the agent programmatically or running tests, install the package: `pip install -e .` (from `FelixAgent/` directory)
-3. Check that all required files exist: `agent.py`, `send_money_agent.py`, etc.
+2. Check that all required files exist: `agent.py`, `send_money_agent.py`, etc.
