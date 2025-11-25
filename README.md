@@ -46,7 +46,7 @@ The agent handles greetings naturally, manages state across conversation turns, 
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/danielavarelat/SendMoneyAgent.git
-   cd agents
+   cd SendMoneyAgent
    ```
 
 2. **Navigate to the FelixAgent directory:**
@@ -72,7 +72,7 @@ The agent handles greetings naturally, manages state across conversation turns, 
 
 6. **Set up your environment variables:**
    
-   Create a `.env` file in the project root (`agents/` directory):
+   Create a `.env` file in the project root (`SendMoneyAgent/` directory):
    ```
    GOOGLE_API_KEY=your-api-key-here
    ```
@@ -84,10 +84,10 @@ The agent handles greetings naturally, manages state across conversation turns, 
 
 ## Usage
 
-Run `adk web` from the project root (`agents/` directory):
+Run `adk web` from the project root (`SendMoneyAgent/` directory):
 
 ```bash
-cd agents
+cd SendMoneyAgent
 adk web
 ```
 
@@ -98,7 +98,7 @@ ADK will automatically discover the agent by reading `pyproject.toml` in the `Fe
 Run the test suite as a module (from the project root):
 
 ```bash
-cd agents
+cd SendMoneyAgent
 python -m FelixAgent.test_agent
 ```
 
@@ -168,7 +168,7 @@ Agent: ✅ ✅ ✅ Transfer Successful!
 **Problem:** Running `adk web` shows "No agents found" or similar error.
 
 **Solution:**
-1. Make sure you're in the project root (`agents/` directory), not inside `FelixAgent/`
+1. Make sure you're in the project root (`SendMoneyAgent/` directory), not inside `FelixAgent/`
 2. Verify `FelixAgent/pyproject.toml` exists and contains:
    ```toml
    [tool.adk]
